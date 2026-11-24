@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en" class="notranslate" translate="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google" content="notranslate">
+    <title>The Inventor's Secret Laboratory - Escape Room</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --card-border: #334155;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --text-main: #f8fafc;
+            --text-sub: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        /* Anti-Copy Protection on Text */
+        .no-select {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 16px 12px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 820px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 16px;
+            padding: 20px 16px;
+            background: rgba(30, 41, 59, 0.85);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+        }
+
+        h1 {
+            color: var(--accent-cyan);
+            font-size: 1.7rem;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+        }
+
+        /* Sticky Dashboard */
+        .sticky-dashboard {
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+            background: #090d16;
+            border: 2px solid var(--accent-cyan);
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.35);
+        }
+
+        .metric-group {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .metric-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .metric-label {
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            color: var(--text-sub);
+            letter-spacing: 0.8px;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .metric-value.cyan { color: var(--accent-cyan); }
+        .metric-value.green { color: var(--accent-green); }
+        .metric-value.red { color: var(--accent-red); }
+
+        .vault-digits-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .digit-slot {
+            width: 34px;
+            height: 40px;
+            background: #1e293b;
+            border: 1px dashed var(--accent-cyan);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--accent-amber);
+            transition: all 0.3s ease;
+        }
+
+        .digit-slot.unlocked {
+            border-style: solid;
+            background: rgba(16, 185, 129, 0.25);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+        }
+
+        /* Navigation Grid */
+        .nav-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+            color: var(--text-sub);
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-btn:hover {
+            border-color: var(--accent-cyan);
+            color: var(--text-main);
+        }
+
+        .nav-btn.active {
+            border-color: var(--accent-cyan);
+            background: rgba(6, 182, 212, 0.2);
+            color: var(--accent-cyan);
+            font-weight: bold;
+        }
+
+        .nav-btn.solved {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .nav-btn.revealed {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        /* Card Container */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+        }
+
+        .story-box {
+            border-left: 4px solid var(--accent-cyan);
+            padding-left: 16px;
+            margin: 14px 0;
+            font-style: italic;
+            color: #cbd5e1;
+            background: rgba(15, 23, 42, 0.5);
+            padding-top: 10px;
+            padding-bottom: 10px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .rules-list {
+            margin-left: 20px;
+            color: var(--text-sub);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+        }
+
+        .rules-list li {
+            margin-bottom: 6px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            margin-bottom: 6px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 11px 14px;
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        input[type="text"]:disabled {
+            opacity: 0.75;
+            background: #182234;
+            cursor: not-allowed;
+        }
+
+        .challenge-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: rgba(6, 182, 212, 0.15);
+            color: var(--accent-cyan);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .badge.checkpoint {
+            background: rgba(245, 158, 11, 0.15);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .challenge-title {
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            color: var(--text-main);
+        }
+
+        .svg-illustration {
+            width: 100%;
+            max-height: 200px;
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .opt-btn {
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: var(--text-main);
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .opt-btn:hover:not(:disabled) {
+            border-color: var(--accent-cyan);
+            background: #1e293b;
+        }
+
+        .opt-btn.correct {
+            border-color: var(--accent-green) !important;
+            background: rgba(16, 185, 129, 0.2) !important;
+            color: var(--accent-green) !important;
+            font-weight: bold;
+        }
+
+        .opt-btn.incorrect {
+            border-color: var(--accent-red) !important;
+            background: rgba(239, 68, 68, 0.2) !important;
+            color: var(--accent-red) !important;
+        }
+
+        .text-input-group {
+            display: flex;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .btn {
+            padding: 11px 22px;
+            background: var(--accent-cyan);
+            color: #0f172a;
+            border: none;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s, background 0.2s;
+        }
+
+        .btn:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+
+        .btn:disabled {
+            background: #475569;
+            color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .btn-hint {
+            background: transparent;
+            border: 1px dashed var(--accent-amber);
+            color: var(--accent-amber);
+            font-size: 0.85rem;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        .hint-box {
+            display: none;
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--accent-amber);
+            border-radius: 6px;
+            padding: 10px 14px;
+            margin-top: 10px;
+            font-size: 0.88rem;
+            color: var(--accent-amber);
+        }
+
+        .feedback-box {
+            display: none;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 14px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .feedback-box.incorrect {
+            display: block;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid var(--accent-red);
+            color: var(--accent-red);
+        }
+
+        .feedback-box.revealed {
+            display: block;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid var(--accent-amber);
+            color: var(--accent-amber);
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--card-border);
+        }
+
+        /* Vault Keypad */
+        .keypad-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .keypad-screen {
+            width: 220px;
+            height: 54px;
+            background: #000;
+            border: 2px solid var(--accent-cyan);
+            border-radius: 8px;
+            color: var(--accent-green);
+            font-family: monospace;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            letter-spacing: 10px;
+            box-shadow: inset 0 0 10px rgba(6, 182, 212, 0.5);
+        }
+
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 220px;
+        }
+
+        .key-btn {
+            height: 50px;
+            background: #0f172a;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-size: 1.25rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .key-btn:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        /* Certificate / Vault Summary */
+        .certificate {
+            background: #0f172a;
+            border: 2px solid var(--accent-green);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+        }
+
+        .certificate h2 {
+            color: var(--accent-green);
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .summary-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .summary-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .summary-table td:last-child {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-green);
+            color: #0f172a;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body class="notranslate" translate="no">
+
+<div class="container">
+    <header class="no-select">
+        <h1>The Inventor's Secret Laboratory</h1>
+        <div class="subtitle">Digital Escape Room — 10th Grade ESL (CEFR A2–B1)</div>
+    </header>
+
+    <!-- Sticky Dashboard -->
+    <div class="sticky-dashboard no-select" id="dashboard">
+        <div class="metric-group">
+            <div class="metric-item">
+                <span class="metric-label">Total Score</span>
+                <span class="metric-value cyan" id="score-total">0</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Base (150)</span>
+                <span class="metric-value" id="score-base">0</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Bonuses</span>
+                <span class="metric-value green" id="score-bonus">+0</span>
+            </div>
+            <div class="metric-item">
+                <span class="metric-label">Penalties</span>
+                <span class="metric-value red" id="score-penalty">-0</span>
+            </div>
+        </div>
+        <div class="vault-digits-header">
+            <span class="metric-label" style="margin-right: 6px;">VAULT CODE:</span>
+            <div class="digit-slot" id="slot-1">?</div>
+            <div class="digit-slot" id="slot-2">?</div>
+            <div class="digit-slot" id="slot-3">?</div>
+            <div class="digit-slot" id="slot-4">?</div>
+        </div>
+    </div>
+
+    <!-- Navigation Grid -->
+    <div class="nav-grid hidden no-select" id="nav-grid"></div>
+
+    <!-- START CARD -->
+    <div class="card no-select" id="start-card">
+        <div class="badge">MISSION BRIEFING</div>
+        <div class="story-box">
+            "Welcome, junior researchers! Brilliant British inventor Professor Alistair Vance has disappeared, leaving behind a locked laboratory filled with his greatest prototypes. To unlock the main vault and save his life’s work, you must analyse historical records of world-changing inventions. Solve all 15 grammar puzzles to collect the 4-digit security code and open the lab door!"
+        </div>
+
+        <h3 style="margin-bottom: 8px; font-size: 1rem; color: var(--accent-cyan);">Rules & Scoring System:</h3>
+        <ul class="rules-list">
+            <li><strong>+10 points</strong> for every main challenge solved correctly (Max Base Score: 150 pts).</li>
+            <li><strong>+5 bonus points</strong> for solving a challenge on your <em>first attempt</em>!</li>
+            <li><strong>-3 points penalty</strong> for every wrong attempt on a challenge (Max 2 attempts per question).</li>
+            <li><strong>-2 points penalty</strong> if you choose to request an optional hint.</li>
+            <li><strong>Checkpoint Digits:</strong> Solving or completing Challenges 4, 8, 12, and 15 unlocks the 4 digits needed for the vault keypad!</li>
+            <li>Use <strong>British English</strong> spelling (e.g., <em>realise</em>, <em>colour</em>, <em>favourite</em>, <em>centre</em>).</li>
+        </ul>
+
+        <div class="form-grid">
+            <div>
+                <label for="student-name">Researcher Name(s): *</label>
+                <input type="text" id="student-name" placeholder="e.g. Maria & João">
+            </div>
+            <div>
+                <label for="student-class">Class & Number: *</label>
+                <input type="text" id="student-class" placeholder="e.g. 10th A - #12, #15">
+            </div>
+        </div>
+        <button class="btn" style="width: 100%; margin-top: 20px; padding: 14px;" onclick="startEscapeRoom()">START MISSION</button>
+    </div>
+
+    <!-- CHALLENGE CARD -->
+    <div class="card hidden no-select" id="challenge-card">
+        <div class="challenge-header">
+            <span class="badge" id="ch-badge">CHALLENGE 1</span>
+            <span style="font-size: 0.85rem; color: var(--text-sub);" id="ch-status-indicator">Unanswered</span>
+        </div>
+        <h2 class="challenge-title" id="ch-title">Title</h2>
+        
+        <div id="svg-container"></div>
+
+        <p style="white-space: pre-line; margin-bottom: 14px;" id="ch-question"></p>
+
+        <!-- Dynamic Input Area -->
+        <div id="ch-input-area" class="notranslate" translate="no"></div>
+
+        <button class="btn-hint" id="btn-hint" onclick="useHint()">💡 Request Hint (-2 pts)</button>
+        <div class="hint-box" id="hint-box"></div>
+        <div class="feedback-box" id="feedback-box"></div>
+
+        <div class="footer-nav">
+            <button class="btn" style="background: #334155; color: var(--text-main);" id="btn-prev" onclick="navigate(-1)">← Previous</button>
+            <button class="btn" id="btn-next" onclick="navigate(1)">Next Challenge →</button>
+        </div>
+    </div>
+
+    <!-- VAULT KEYPAD CARD -->
+    <div class="card hidden no-select" id="vault-card">
+        <div class="badge checkpoint">FINAL STEP: LABORATORY VAULT</div>
+        <h2 style="text-align: center; margin-top: 10px; color: var(--accent-cyan);">Security Keypad</h2>
+        <p style="text-align: center; color: var(--text-sub); margin-bottom: 20px;">
+            Enter the 4-digit security code you unlocked from Challenges 4, 8, 12, and 15!
+        </p>
+
+        <div class="keypad-container">
+            <div class="keypad-screen" id="keypad-display">____</div>
+            <div class="keypad-grid">
+                <button class="key-btn" onclick="pressKey('1')">1</button>
+                <button class="key-btn" onclick="pressKey('2')">2</button>
+                <button class="key-btn" onclick="pressKey('3')">3</button>
+                <button class="key-btn" onclick="pressKey('4')">4</button>
+                <button class="key-btn" onclick="pressKey('5')">5</button>
+                <button class="key-btn" onclick="pressKey('6')">6</button>
+                <button class="key-btn" onclick="pressKey('7')">7</button>
+                <button class="key-btn" onclick="pressKey('8')">8</button>
+                <button class="key-btn" onclick="pressKey('9')">9</button>
+                <button class="key-btn" style="color: var(--accent-red);" onclick="clearKeypad()">C</button>
+                <button class="key-btn" onclick="pressKey('0')">0</button>
+                <button class="key-btn" style="color: var(--accent-green);" onclick="submitKeypad()">OK</button>
+            </div>
+            <div class="feedback-box" id="keypad-feedback"></div>
+        </div>
+
+        <div class="footer-nav" style="margin-top: 24px;">
+            <button class="btn" style="background: #334155; color: var(--text-main);" onclick="jumpToChallenge(15)">← Back to Challenges</button>
+        </div>
+    </div>
+
+    <!-- CERTIFICATE CARD -->
+    <div class="card hidden" id="certificate-card">
+        <div class="certificate">
+            <h2>🎉 MISSION ACCOMPLISHED!</h2>
+            <p style="color: var(--text-sub); margin-bottom: 16px;">
+                You have unlocked Professor Vance’s Laboratory and secured his prototypes!
+            </p>
+
+            <table class="summary-table">
+                <tr><td>Researcher Name(s):</td><td id="cert-name">-</td></tr>
+                <tr><td>Class & Number:</td><td id="cert-class">-</td></tr>
+                <tr><td>Date & Time:</td><td id="cert-date">-</td></tr>
+                <tr><td>Vault Code Unlocked:</td><td style="color: var(--accent-green);">7394</td></tr>
+                <tr><td>Base Score (Max 150):</td><td id="cert-base">0 / 150</td></tr>
+                <tr><td>First-Try Bonuses:</td><td style="color: var(--accent-green);" id="cert-bonus">+0</td></tr>
+                <tr><td>Optional Bonus Challenge:</td><td style="color: var(--accent-green);" id="cert-opt-bonus">+0</td></tr>
+                <tr><td>Penalties (Wrong / Hints):</td><td style="color: var(--accent-red);" id="cert-penalty">-0</td></tr>
+                <tr style="font-size: 1.15rem; border-top: 2px solid var(--accent-cyan);">
+                    <td>FINAL TOTAL SCORE:</td>
+                    <td style="color: var(--accent-cyan);" id="cert-total">0</td>
+                </tr>
+            </table>
+
+            <button class="btn" style="width: 100%; padding: 14px;" onclick="copyResults()">📋 Copy Results for Teacher</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast" id="toast">Results copied to clipboard!</div>
+
+<textarea id="copy-buffer" style="position: absolute; left: -9999px;"></textarea>
+
+<script>
+    // Anti-Cheat: Prevent Context Menu & Common Copy/Inspect Shortcuts
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+        if (e.ctrlKey && (e.key === 'c' || e.key === 'u' || e.key === 's' || e.key === 'p' || e.key === 'a')) {
+            e.preventDefault();
+        }
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C'))) {
+            e.preventDefault();
+        }
+    });
+
+    // SVG Illustrations
+    const SVGs = {
+        telephone: `<svg class="svg-illustration" viewBox="0 0 300 120">
+            <rect width="300" height="120" fill="#0f172a"/>
+            <path d="M 60 90 L 100 90 L 95 60 L 65 60 Z" fill="#475569" stroke="#06b6d4" stroke-width="2"/>
+            <path d="M 80 60 L 80 30 M 70 30 L 90 30" stroke="#f59e0b" stroke-width="4"/>
+            <circle cx="80" cy="20" r="12" fill="#334155" stroke="#f59e0b" stroke-width="2"/>
+            <text x="130" y="55" fill="#f8fafc" font-size="14" font-weight="bold">1876: The Telephone</text>
+            <text x="130" y="75" fill="#94a3b8" font-size="12">Patented by Graham Bell</text>
+            <line x1="130" y1="85" x2="270" y2="85" stroke="#06b6d4" stroke-width="2"/>
+            <circle cx="130" cy="85" r="4" fill="#10b981"/>
+            <circle cx="270" cy="85" r="4" fill="#06b6d4"/>
+        </svg>`,
+
+        // High-Contrast Victorian Incandescent Light Bulb SVG
+        lightbulb: `<svg class="svg-illustration" viewBox="0 0 300 120">
+            <rect width="300" height="120" fill="#0f172a"/>
+            <!-- Inner Dark Background Badge -->
+            <rect x="15" y="10" width="100" height="100" rx="10" fill="#1e293b" stroke="#334155" stroke-width="1.5"/>
+            <!-- Glow Aura -->
+            <circle cx="65" cy="50" r="30" fill="rgba(245, 158, 11, 0.25)"/>
+            <!-- Glass Bulb Shape -->
+            <path d="M 50 50 C 50 35, 80 35, 80 50 C 80 58, 72 63, 72 70 L 58 70 C 58 63, 50 58, 50 50 Z" fill="rgba(254, 243, 199, 0.15)" stroke="#f59e0b" stroke-width="2.5"/>
+            <!-- Glass Reflection Highlight -->
+            <path d="M 54 44 C 54 39, 62 38, 65 38" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+            <!-- Glowing Filament -->
+            <path d="M 60 70 L 60 52 Q 65 42 70 52 L 70 70" stroke="#fbbf24" stroke-width="2" fill="none"/>
+            <circle cx="65" cy="46" r="3" fill="#ef4444"/>
+            <!-- Metallic Base -->
+            <rect x="58" y="70" width="14" height="12" rx="2" fill="#94a3b8" stroke="#475569" stroke-width="1"/>
+            <rect x="60" y="82" width="10" height="4" fill="#64748b"/>
+            <!-- Text Content -->
+            <text x="130" y="48" fill="#f8fafc" font-size="14" font-weight="bold">1800 ─── 1879 Timeline</text>
+            <text x="130" y="70" fill="#f59e0b" font-size="12" font-weight="600">Edison's Incandescent Bulb (1879)</text>
+            <text x="130" y="88" fill="#94a3b8" font-size="11">First commercially practical electric light</text>
+            <line x1="130" y1="98" x2="280" y2="98" stroke="#334155" stroke-width="3"/>
+            <line x1="130" y1="98" x2="245" y2="98" stroke="#f59e0b" stroke-width="3"/>
+            <circle cx="245" cy="98" r="5" fill="#f59e0b"/>
+        </svg>`,
+
+        penicillin: `<svg class="svg-illustration" viewBox="0 0 300 120">
+            <rect width="300" height="120" fill="#0f172a"/>
+            <circle cx="70" cy="60" r="40" fill="#1e293b" stroke="#06b6d4" stroke-width="2"/>
+            <circle cx="55" cy="50" r="12" fill="rgba(16, 185, 129, 0.5)"/>
+            <circle cx="85" cy="70" r="8" fill="rgba(239, 68, 68, 0.4)"/>
+            <circle cx="75" cy="45" r="5" fill="rgba(239, 68, 68, 0.4)"/>
+            <text x="130" y="50" fill="#f8fafc" font-size="14" font-weight="bold">London, 1928</text>
+            <text x="130" y="70" fill="#10b981" font-size="12">Penicillin Mould Discovery</text>
+            <text x="130" y="88" fill="#94a3b8" font-size="11">Alexander Fleming</text>
+        </svg>`,
+
+        electricCar: `<svg class="svg-illustration" viewBox="0 0 300 120">
+            <rect width="300" height="120" fill="#0f172a"/>
+            <path d="M 40 75 Q 50 50 80 50 L 110 50 Q 130 50 140 75 Z" fill="#06b6d4"/>
+            <rect x="30" y="70" width="120" height="20" rx="5" fill="#1e293b" stroke="#06b6d4"/>
+            <circle cx="55" cy="90" r="10" fill="#475569" stroke="#f8fafc"/>
+            <circle cx="125" cy="90" r="10" fill="#475569" stroke="#f8fafc"/>
+            <path d="M 170 40 L 170 90 M 170 55 L 150 70" stroke="#10b981" stroke-width="3" fill="none"/>
+            <text x="185" y="60" fill="#10b981" font-size="14" font-weight="bold">EV Fast Charger</text>
+            <text x="185" y="80" fill="#94a3b8" font-size="11">Recent Innovation</text>
+        </svg>`,
+
+        timePortal: `<svg class="svg-illustration" viewBox="0 0 300 120">
+            <rect width="300" height="120" fill="#0f172a"/>
+            <ellipse cx="70" cy="60" rx="45" ry="30" fill="none" stroke="#06b6d4" stroke-width="3" stroke-dasharray="6,4"/>
+            <ellipse cx="70" cy="60" rx="30" ry="20" fill="none" stroke="#f59e0b" stroke-width="2"/>
+            <circle cx="70" cy="60" r="8" fill="#10b981"/>
+            <text x="135" y="55" fill="#f8fafc" font-size="14" font-weight="bold">Time Machine Lab</text>
+            <text x="135" y="75" fill="#94a3b8" font-size="12">Life Experience Record</text>
+        </svg>`,
+
+        marsRover: `<svg class="svg-illustration" viewBox="0 0 300 120">
+            <rect width="300" height="120" fill="#0f172a"/>
+            <path d="M 0 95 Q 150 80 300 95 L 300 120 L 0 120 Z" fill="#7c2d12"/>
+            <rect x="60" y="65" width="40" height="20" fill="#cbd5e1" rx="3"/>
+            <circle cx="65" cy="88" r="6" fill="#1e293b"/>
+            <circle cx="80" cy="88" r="6" fill="#1e293b"/>
+            <circle cx="95" cy="88" r="6" fill="#1e293b"/>
+            <line x1="80" y1="65" x2="80" y2="45" stroke="#38bdf8" stroke-width="2"/>
+            <circle cx="80" cy="42" r="4" fill="#ef4444"/>
+            <text x="130" y="50" fill="#f8fafc" font-size="14" font-weight="bold">Mars Mission Log</text>
+            <text x="130" y="70" fill="#f97316" font-size="12">Ongoing Exploration</text>
+        </svg>`
+    };
+
+    // Challenges Data
+    const challenges = [
+        {
+            id: 1,
+            title: "The Telephone",
+            badge: "CHALLENGE 1 OF 15",
+            svg: SVGs.telephone,
+            question: "Alexander Graham Bell ________ the first practical telephone in 1876.",
+            type: "mcq",
+            options: ["has patented", "patented", "have patented"],
+            correctAnswer: 1,
+            hint: "Look at the specific year at the end of the sentence ('in 1876'). Is that finished time or unfinished time?",
+            explanation: "Because 'in 1876' is a finished time in the past, we use the Past Simple (patented)."
+        },
+        {
+            id: 2,
+            title: "Modern Smartphones",
+            badge: "CHALLENGE 2 OF 15",
+            question: "Complete the gap with the correct form of the verb in brackets (use British English spelling):\n'Since the 2000s, mobile phones ________ (revolutionise) how we communicate every day.'",
+            type: "text",
+            correctAnswers: ["have revolutionised", "have revolutionised."],
+            hint: "'Since the 2000s' connects the past to the present. British English uses -ise.",
+            explanation: "'Since' connects a past point to the present, requiring Present Perfect (have revolutionised)."
+        },
+        {
+            id: 3,
+            title: "The Light Bulb",
+            badge: "CHALLENGE 3 OF 15",
+            svg: SVGs.lightbulb,
+            question: "Thomas Edison and his team ________ thousands of experiments before they created a commercially practical light bulb in 1879.",
+            type: "mcq",
+            options: ["conducted", "have conducted", "has conducted"],
+            correctAnswer: 0,
+            hint: "Both actions occurred in a finished period of history (1879).",
+            explanation: "Both actions happened in the past (1879), requiring Past Simple (conducted)."
+        },
+        {
+            id: 4,
+            title: "Space Exploration",
+            badge: "CHALLENGE 4 OF 15 — CHECKPOINT",
+            checkpoint: true,
+            digitIndex: 0,
+            digitValue: "7",
+            question: "Error Correction: Identify the mistake in the sentence below and write ONLY the corrected verb form (1 word):\n\n'Have you ever saw a live rocket launch on television?'",
+            type: "text",
+            correctAnswers: ["seen"],
+            hint: "With 'Have you ever...', we need the past participle (3rd column) of 'see'.",
+            explanation: "We use the past participle 'seen' with Present Perfect. UNLOCKED DIGIT 1: Write down 7!"
+        },
+        {
+            id: 5,
+            title: "Penicillin",
+            badge: "CHALLENGE 5 OF 15",
+            svg: SVGs.penicillin,
+            question: "Scottish scientist Alexander Fleming discovered penicillin in London. Which sentence is grammatically correct?",
+            type: "mcq",
+            options: [
+                "Alexander Fleming has discovered penicillin in 1928.",
+                "Alexander Fleming discovered penicillin in 1928.",
+                "Alexander Fleming have discovered penicillin in 1928."
+            ],
+            correctAnswer: 1,
+            hint: "Never use Present Perfect with a specific finished date like 'in 1928'.",
+            explanation: "Specific past dates always trigger the Past Simple (discovered)."
+        },
+        {
+            id: 6,
+            title: "The World Wide Web",
+            badge: "CHALLENGE 6 OF 15",
+            question: "Complete the gap with the correct form of the verb in brackets:\n'British computer scientist Tim Berners-Lee ________ (invent) the World Wide Web in 1989.'",
+            type: "text",
+            correctAnswers: ["invented"],
+            hint: "Regular verb + finished year (1989).",
+            explanation: "'Invented' (Past Simple) fits the finished year 1989."
+        },
+        {
+            id: 7,
+            title: "Artificial Intelligence",
+            badge: "CHALLENGE 7 OF 15",
+            question: "Look at the progress in robotics! Scientists ________ already ________ (create) machines that can diagnose diseases faster than doctors.",
+            type: "mcq",
+            options: ["did / create", "have / created", "has / created"],
+            correctAnswer: 1,
+            hint: "Notice the time marker 'already' and plural subject 'Scientists'.",
+            explanation: "'Already' + plural subject 'Scientists' = have created."
+        },
+        {
+            id: 8,
+            title: "Electric Cars",
+            badge: "CHALLENGE 8 OF 15 — CHECKPOINT",
+            checkpoint: true,
+            digitIndex: 1,
+            digitValue: "3",
+            svg: SVGs.electricCar,
+            question: "My favourite car company ________ a new battery that charges in five minutes! They announced it just an hour ago.",
+            type: "mcq",
+            options: ["recently developed", "has recently developed", "have recently developed"],
+            correctAnswer: 1,
+            hint: "'Recently' indicates a recent action with a result in the present. 'Company' is singular.",
+            explanation: "Present Perfect with 'recently' highlights a new achievement. UNLOCKED DIGIT 2: Write down 3!"
+        },
+        {
+            id: 9,
+            title: "Television",
+            badge: "CHALLENGE 9 OF 15",
+            question: "Complete the gap with the correct form of the verb in brackets:\n'John Logie Baird ________ (demonstrate) the world's first working television system in London in 1926.'",
+            type: "text",
+            correctAnswers: ["demonstrated"],
+            hint: "'In 1926' is a finished past time expression.",
+            explanation: "'Demonstrated' is the correct Past Simple form."
+        },
+        {
+            id: 10,
+            title: "Colour Photography",
+            badge: "CHALLENGE 10 OF 15",
+            question: "Error Correction: Find the error in the sentence and write ONLY the corrected verb form (1 word):\n'Yesterday, our science teacher shows us the first colour photograph.'",
+            type: "text",
+            correctAnswers: ["showed"],
+            hint: "Look at the very first word of the sentence: 'Yesterday'.",
+            explanation: "'Yesterday' requires Past Simple (showed)."
+        },
+        {
+            id: 11,
+            title: "Medical Vaccines",
+            badge: "CHALLENGE 11 OF 15",
+            question: "Thanks to modern vaccines, doctors ________ (save) millions of lives around the world over the last few decades.",
+            type: "mcq",
+            options: ["saved", "have saved", "has saved"],
+            correctAnswer: 1,
+            hint: "'Over the last few decades' is a period continuing up to now.",
+            explanation: "An unfinished period continuing to the present takes Present Perfect (have saved)."
+        },
+        {
+            id: 12,
+            title: "Time Travel",
+            badge: "CHALLENGE 12 OF 15 — CHECKPOINT",
+            checkpoint: true,
+            digitIndex: 2,
+            digitValue: "9",
+            svg: SVGs.timePortal,
+            question: "Complete the sentence with the correct verb form:\n'Humanity ________ never ________ (build) a real time machine, even though authors have written books about it.'",
+            type: "mcq",
+            options: ["has / built", "have / built", "did / build"],
+            correctAnswer: 0,
+            hint: "'Never' (in life experience up to now) uses Present Perfect. 'Humanity' is singular.",
+            explanation: "'Humanity' (singular) + 'never' = has built. UNLOCKED DIGIT 3: Write down 9!"
+        },
+        {
+            id: 13,
+            title: "The Mars Rover",
+            badge: "CHALLENGE 13 OF 15",
+            svg: SVGs.marsRover,
+            question: "Choose the correct time expression to complete the logbook entry:\n'The Mars rover has collected fifteen rock samples ________, and its mission isn't over yet.'",
+            type: "mcq",
+            options: ["yesterday", "so far", "in 2021"],
+            correctAnswer: 1,
+            hint: "Which expression means 'until now' in an ongoing situation?",
+            explanation: "'So far' means 'up to this point in time' and is used with Present Perfect."
+        },
+        {
+            id: 14,
+            title: "The Unfinished Prototype",
+            badge: "CHALLENGE 14 OF 15",
+            question: "Complete the gap with ONE word (for, since, yet, or already):\n'Professor Vance started working on his invisibility cloak three weeks ago, and he hasn't finished testing it ________.'",
+            type: "text",
+            correctAnswers: ["yet"],
+            hint: "Used at the end of negative Present Perfect sentences.",
+            explanation: "We use 'yet' at the end of negative sentences in Present Perfect."
+        },
+        {
+            id: 15,
+            title: "The Centre for Innovation",
+            badge: "CHALLENGE 15 OF 15 — CHECKPOINT",
+            checkpoint: true,
+            digitIndex: 3,
+            digitValue: "4",
+            question: "Complete the gap with ONE word (for, since, yet, or just):\n'The Royal Centre for Science and Innovation has been open ________ 2015, welcoming young inventors.'",
+            type: "text",
+            correctAnswers: ["since"],
+            hint: "'2015' is a specific starting point in time.",
+            explanation: "We use 'since' with a specific starting point in time (since 2015). UNLOCKED DIGIT 4: Write down 4!"
+        },
+        {
+            id: 16,
+            title: "The Patent Office (Optional Bonus)",
+            badge: "OPTIONAL BONUS CHALLENGE (+10 PTS)",
+            isBonus: true,
+            question: "Complete the second sentence so that it has the same meaning as the first. Use SINCE and the pronoun 'them' (Write 5 words in the gap):\n\nOriginal: The engineer last updated the software blueprints in 2024.\nNew: The engineer ________________________ 2024.",
+            type: "text",
+            correctAnswers: ["has not updated them since", "hasn't updated them since"],
+            hint: "Negative Present Perfect: has not + updated + pronoun + since.",
+            explanation: "Mastery! 'has not updated them since 2024' (or 'hasn't updated them since') (+10 bonus points!)."
+        }
+    ];
+
+    // State Tracking
+    let state = {};
+    challenges.forEach(ch => {
+        state[ch.id] = {
+            status: 'unanswered', // 'unanswered' | 'solved' | 'revealed'
+            attempts: 0,
+            hintUsed: false,
+            baseEarned: 0,
+            bonusEarned: 0,
+            penalties: 0,
+            userAnswer: ""
+        };
+    });
+
+    let currentChIdx = 0;
+    let unlockedDigits = ["?", "?", "?", "?"];
+    let keypadInput = "";
+
+    function startEscapeRoom() {
+        const name = document.getElementById('student-name').value.trim();
+        const studentClass = document.getElementById('student-class').value.trim();
+
+        if (!name || !studentClass) {
+            alert("Please enter both Researcher Name(s) and Class & Number!");
+            return;
+        }
+
+        document.getElementById('start-card').classList.add('hidden');
+        document.getElementById('nav-grid').classList.remove('hidden');
+        document.getElementById('challenge-card').classList.remove('hidden');
+
+        renderNavGrid();
+        loadChallenge(0);
+    }
+
+    function renderNavGrid() {
+        const grid = document.getElementById('nav-grid');
+        grid.innerHTML = challenges.map((ch, idx) => {
+            let label = ch.isBonus ? '★' : (idx + 1);
+            let stateClass = state[ch.id].status;
+            let activeClass = (idx === currentChIdx) ? 'active' : '';
+            return `<button class="nav-btn ${stateClass} ${activeClass}" onclick="jumpToChallenge(${idx})">${label}</button>`;
+        }).join('') + `<button class="nav-btn" id="vault-nav-btn" style="border-color: var(--accent-amber); color: var(--accent-amber);" onclick="showVaultCard()">🔒</button>`;
+    }
+
+    function jumpToChallenge(idx) {
+        document.getElementById('vault-card').classList.add('hidden');
+        document.getElementById('challenge-card').classList.remove('hidden');
+        currentChIdx = idx;
+        renderNavGrid();
+        loadChallenge(idx);
+    }
+
+    function loadChallenge(idx) {
+        const ch = challenges[idx];
+        const st = state[ch.id];
+
+        document.getElementById('ch-badge').innerText = ch.badge;
+        document.getElementById('ch-badge').className = ch.checkpoint ? 'badge checkpoint' : 'badge';
+        document.getElementById('ch-title').innerText = ch.title;
+        document.getElementById('ch-question').innerText = ch.question;
+
+        // SVG
+        const svgContainer = document.getElementById('svg-container');
+        svgContainer.innerHTML = ch.svg ? ch.svg : '';
+
+        // Status Indicator
+        const statusInd = document.getElementById('ch-status-indicator');
+        if (st.status === 'solved') {
+            statusInd.innerText = "✓ Solved";
+            statusInd.style.color = "var(--accent-green)";
+        } else if (st.status === 'revealed') {
+            statusInd.innerText = "⚠ Answer Revealed";
+            statusInd.style.color = "var(--accent-amber)";
+        } else {
+            statusInd.innerText = `Attempt ${st.attempts + 1} of 2`;
+            statusInd.style.color = "var(--text-sub)";
+        }
+
+        // Render Input Area
+        const inputArea = document.getElementById('ch-input-area');
+        const isLocked = st.status !== 'unanswered';
+
+        if (ch.type === 'mcq') {
+            inputArea.innerHTML = `
+                <div class="options-list">
+                    ${ch.options.map((opt, oIdx) => {
+                        let btnClass = "opt-btn";
+                        if (isLocked) {
+                            if (oIdx === ch.correctAnswer) btnClass += " correct";
+                            else if (st.userAnswer === oIdx && oIdx !== ch.correctAnswer) btnClass += " incorrect";
+                        }
+                        return `<button class="${btnClass}" ${isLocked ? 'disabled' : ''} onclick="submitMcq(${oIdx})">${String.fromCharCode(65 + oIdx)}) ${opt}</button>`;
+                    }).join('')}
+                </div>
+            `;
+        } else {
+            inputArea.innerHTML = `
+                <div class="text-input-group">
+                    <input type="text" id="text-answer-input" value="${st.userAnswer}" placeholder="Type answer..." ${isLocked ? 'disabled' : ''} onkeydown="if(event.key==='Enter') submitText()">
+                    <button class="btn" id="btn-text-submit" ${isLocked ? 'disabled' : ''} onclick="submitText()">Submit</button>
+                </div>
+            `;
+        }
+
+        // Hint Box State
+        const hintBtn = document.getElementById('btn-hint');
+        const hintBox = document.getElementById('hint-box');
+        hintBox.innerText = ch.hint;
+        if (st.hintUsed) {
+            hintBtn.innerText = "💡 Hint Opened (-2 pts)";
+            hintBtn.disabled = true;
+            hintBox.style.display = 'block';
+        } else {
+            hintBtn.innerText = "💡 Request Hint (-2 pts)";
+            hintBtn.disabled = isLocked;
+            hintBox.style.display = 'none';
+        }
+
+        // Feedback Box State
+        const feedbackBox = document.getElementById('feedback-box');
+        if (st.status === 'solved') {
+            feedbackBox.className = 'feedback-box correct';
+            let bonusMsg = (st.bonusEarned > 0 && !ch.isBonus) ? "<br><em>+5 First-Try Bonus awarded!</em>" : "";
+            feedbackBox.innerHTML = `<strong>Correct!</strong> ${ch.explanation}${bonusMsg}`;
+        } else if (st.status === 'revealed') {
+            feedbackBox.className = 'feedback-box revealed';
+            let correctStr = ch.type === 'mcq' ? `${String.fromCharCode(65 + ch.correctAnswer)}) ${ch.options[ch.correctAnswer]}` : ch.correctAnswers[0];
+            feedbackBox.innerHTML = `<strong>Max Attempts Reached:</strong> The correct answer is <strong>${correctStr}</strong>.<br>${ch.explanation}`;
+        } else if (st.attempts === 1) {
+            feedbackBox.className = 'feedback-box incorrect';
+            feedbackBox.innerText = "Incorrect! (-3 points penalty). You have 1 attempt remaining!";
+        } else {
+            feedbackBox.className = 'feedback-box';
+            feedbackBox.innerText = "";
+        }
+
+        // Footer Nav Buttons
+        document.getElementById('btn-prev').disabled = (idx === 0);
+        const nextBtn = document.getElementById('btn-next');
+        if (idx === challenges.length - 1) {
+            nextBtn.innerText = "Go to Vault Keypad 🔒";
+            nextBtn.onclick = showVaultCard;
+        } else {
+            nextBtn.innerText = "Next Challenge →";
+            nextBtn.onclick = () => navigate(1);
+        }
+    }
+
+    function useHint() {
+        const ch = challenges[currentChIdx];
+        const st = state[ch.id];
+        if (!st.hintUsed && st.status === 'unanswered') {
+            st.hintUsed = true;
+            st.penalties += 2;
+            updateDashboard();
+            loadChallenge(currentChIdx);
+        }
+    }
+
+    function submitMcq(optIdx) {
+        const ch = challenges[currentChIdx];
+        const st = state[ch.id];
+        if (st.status !== 'unanswered') return;
+
+        st.attempts++;
+        st.userAnswer = optIdx;
+
+        if (optIdx === ch.correctAnswer) {
+            st.status = 'solved';
+            if (ch.isBonus) {
+                st.bonusEarned += 10;
+            } else {
+                st.baseEarned = 10;
+                if (st.attempts === 1) st.bonusEarned = 5;
+            }
+            if (ch.checkpoint) unlockDigit(ch.digitIndex, ch.digitValue);
+        } else {
+            st.penalties += 3;
+            if (st.attempts >= 2) {
+                st.status = 'revealed';
+                if (ch.checkpoint) unlockDigit(ch.digitIndex, ch.digitValue);
+            }
+        }
+
+        updateDashboard();
+        renderNavGrid();
+        loadChallenge(currentChIdx);
+    }
+
+    function submitText() {
+        const ch = challenges[currentChIdx];
+        const st = state[ch.id];
+        if (st.status !== 'unanswered') return;
+
+        const rawVal = document.getElementById('text-answer-input').value;
+        const normalized = rawVal.trim().toLowerCase().replace(/\s+/g, ' ');
+
+        if (!normalized) return;
+
+        st.attempts++;
+        st.userAnswer = rawVal;
+
+        const isCorrect = ch.correctAnswers.some(ans => ans.toLowerCase().replace(/\s+/g, ' ') === normalized);
+
+        if (isCorrect) {
+            st.status = 'solved';
+            if (ch.isBonus) {
+                st.bonusEarned += 10;
+            } else {
+                st.baseEarned = 10;
+                if (st.attempts === 1) st.bonusEarned = 5;
+            }
+            if (ch.checkpoint) unlockDigit(ch.digitIndex, ch.digitValue);
+        } else {
+            st.penalties += 3;
+            if (st.attempts >= 2) {
+                st.status = 'revealed';
+                if (ch.checkpoint) unlockDigit(ch.digitIndex, ch.digitValue);
+            }
+        }
+
+        updateDashboard();
+        renderNavGrid();
+        loadChallenge(currentChIdx);
+    }
+
+    function unlockDigit(slotIdx, val) {
+        unlockedDigits[slotIdx] = val;
+        const slot = document.getElementById(`slot-${slotIdx + 1}`);
+        slot.innerText = val;
+        slot.classList.add('unlocked');
+    }
+
+    function updateDashboard() {
+        let baseSum = 0;
+        let bonusSum = 0;
+        let penaltySum = 0;
+
+        Object.values(state).forEach(st => {
+            baseSum += st.baseEarned;
+            bonusSum += st.bonusEarned;
+            penaltySum += st.penalties;
+        });
+
+        let total = baseSum + bonusSum - penaltySum;
+
+        document.getElementById('score-base').innerText = baseSum;
+        document.getElementById('score-bonus').innerText = `+${bonusSum}`;
+        document.getElementById('score-penalty').innerText = `-${penaltySum}`;
+        document.getElementById('score-total').innerText = total;
+    }
+
+    function navigate(dir) {
+        let newIdx = currentChIdx + dir;
+        if (newIdx >= 0 && newIdx < challenges.length) {
+            jumpToChallenge(newIdx);
+        }
+    }
+
+    function showVaultCard() {
+        document.getElementById('challenge-card').classList.add('hidden');
+        document.getElementById('vault-card').classList.remove('hidden');
+    }
+
+    /* Keypad Logic */
+    function pressKey(digit) {
+        if (keypadInput.length < 4) {
+            keypadInput += digit;
+            updateKeypadDisplay();
+        }
+    }
+
+    function clearKeypad() {
+        keypadInput = "";
+        updateKeypadDisplay();
+        document.getElementById('keypad-feedback').className = 'feedback-box';
+        document.getElementById('keypad-feedback').innerText = "";
+    }
+
+    function updateKeypadDisplay() {
+        document.getElementById('keypad-display').innerText = keypadInput.padEnd(4, '_');
+    }
+
+    function submitKeypad() {
+        const feedback = document.getElementById('keypad-feedback');
+        if (keypadInput === "7394") {
+            feedback.className = 'feedback-box correct';
+            feedback.innerText = "ACCESS GRANTED! Opening laboratory vault...";
+            setTimeout(() => {
+                showCertificate();
+            }, 1000);
+        } else {
+            feedback.className = 'feedback-box incorrect';
+            feedback.innerText = "ACCESS DENIED! Invalid 4-digit code. Check your unlocked digits!";
+            clearKeypad();
+        }
+    }
+
+    function showCertificate() {
+        document.getElementById('vault-card').classList.add('hidden');
+        document.getElementById('nav-grid').classList.add('hidden');
+        document.getElementById('certificate-card').classList.remove('hidden');
+
+        const name = document.getElementById('student-name').value;
+        const studentClass = document.getElementById('student-class').value;
+
+        let baseSum = 0, bonusSum = 0, optBonus = 0, penaltySum = 0;
+        Object.values(state).forEach(st => {
+            baseSum += st.baseEarned;
+            bonusSum += st.bonusEarned;
+            penaltySum += st.penalties;
+        });
+
+        if (state[16].status === 'solved') {
+            optBonus = 10;
+            bonusSum -= 10; // separate optional bonus for certificate breakdown
+        }
+
+        let total = baseSum + bonusSum + optBonus - penaltySum;
+
+        document.getElementById('cert-name').innerText = name;
+        document.getElementById('cert-class').innerText = studentClass;
+        document.getElementById('cert-date').innerText = new Date().toLocaleString('en-GB');
+        document.getElementById('cert-base').innerText = `${baseSum} / 150`;
+        document.getElementById('cert-bonus').innerText = `+${bonusSum} pts`;
+        document.getElementById('cert-opt-bonus').innerText = `+${optBonus} pts`;
+        document.getElementById('cert-penalty').innerText = `-${penaltySum} pts`;
+        document.getElementById('cert-total').innerText = total;
+    }
+
+    function copyResults() {
+        const name = document.getElementById('student-name').value;
+        const studentClass = document.getElementById('student-class').value;
+        const totalScore = document.getElementById('cert-total').innerText;
+        const baseScore = document.getElementById('cert-base').innerText;
+        const bonusScore = document.getElementById('cert-bonus').innerText;
+        const optBonus = document.getElementById('cert-opt-bonus').innerText;
+        const penaltyScore = document.getElementById('cert-penalty').innerText;
+        const dateStr = document.getElementById('cert-date').innerText;
+
+        const summaryText = `[GREAT INVENTIONS ESCAPE ROOM RESULT]
+Researcher: ${name}
+Class: ${studentClass}
+Date: ${dateStr}
+Code Unlocked: 7394 (Success)
+----------------------------
+Final Total Score: ${totalScore} pts
+- Base Score: ${baseScore}
+- First-Try Bonuses: ${bonusScore}
+- Optional Challenge: ${optBonus}
+- Penalties: ${penaltyScore}`;
+
+        const buffer = document.getElementById('copy-buffer');
+        buffer.value = summaryText;
+        buffer.select();
+        document.execCommand('copy');
+
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+</script>
+</body>
+</html>
